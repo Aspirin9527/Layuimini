@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>layui</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" href="../lib/layui-v2.5.6/css/layui.css" media="all">
+    <link rel="stylesheet" href="../css/public.css" media="all">
+</head>
+<body>
+<div class="layuimini-container">
+    <div class="layuimini-main">
+
+        <fieldset class="table-search-fieldset">
+            <legend>搜索信息</legend>
+            <div style="margin: 10px 10px 10px 10px">
+                <form class="layui-form layui-form-pane" action="">
+                    <div class="layui-form-item">
+                        <div class="layui-inline">
+                            <label class="layui-form-label">商品名称</label>
+                            <div class="layui-input-inline">
+                                <input type="text" name="name" autocomplete="off" class="layui-input">
+                            </div>
+                        </div>
+                        <!--<div class="layui-inline">
+                            <label class="layui-form-label">商品编号</label>
+                            <div class="layui-input-inline">
+                                <input type="text" name="no" autocomplete="off" class="layui-input">
+                            </div>
+                        </div>-->
+
+                        <div class="layui-inline">
+                            <!--<label class="layui-form-label">商品类型</label>
+                            <div class="layui-input-inline">
+                                <select lay-filter="type" name="type">
+                                    <option value=""></option>
+                                    <option value="268">口罩</option>
+                                    <option value="270">酒精</option>
+                                    <option value="3">图文</option>
+                                    <option value="4">链接</option>
+                                </select>
+                            </div>-->
+                            <label class="layui-form-label">商品类型:</label>
+                            <div class="layui-input-block">
+                                <input class="layui-hide" id="categoryCascader" lay-verType="tips"
+                                       lay-verify="required" name="categoryId" placeholder="请选择"
+                                       required/>
+                            </div>
+                        </div>
+                        <div class="layui-inline">
+                            <button type="submit" class="layui-btn layui-btn-primary" lay-submit
+                                    lay-filter="data-search-btn"><i class="layui-icon"></i> 搜 索
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </fieldset>
+
+        <div style="margin-top:70px;" id="product"></div>
+        <div style="position: relative; overflow: hidden; width: 1630px; height: 50px; padding: 0px; margin: 0px; border-width: 0px;">
+            <div id="layuipage"></div>
+        </div>
+
+    </div>
+</div>
+
+<script src="../lib/layui-v2.5.6/layui.js" charset="utf-8"></script>
+<script charset="utf-8" src="../js/lay-config.js"></script>
+<script charset="utf-8" src="../js/admin.js"></script>
+
+<script>
+    layui.use(['jquery', 'layer', 'form', 'cascader','laypage'], function () {
+        var $ = layui.jquery,
+            layer = layui.layer,
+            form = layui.form,
+            cascader = layui.cascader,
+            laypage = layui.laypage;
+
+        var page = 1;//当前页
+        //var limit = 10;//每页显示的数目
+        var resCount, resData;
+        var resPage = renderPage1();
+
+        //渲染展示商品的html页面
+        function renderProductHtml(data) {
+            var str = "";//用来存储html内容
+            if (data.length > 0) {
+                $.each(data, function (v, o) {
+                    str += "<div style='margin:auto; margin-bottom:130px;  width:300px; height:150px; float:left; text-align:center'>" +
+                        "<div><img alt='' src='" + o.mainPic + "' width='150px' height='150px'/></div>";
+                    str += "<div style='text-align:center'><div><label>商品名称:</label><span>" + o.name + "</span></div>";
+                    str += "<div><label>价格:</label><span style='color:#FF3030;'>￥" + o.price + "</span></div>";
+                    str += "<label>库存:</label><span style='color:#CDC9C9;'>" + o.stock + "</span></div>";
+                    str += "<div style='display:none;'><label>商品ID:</label><span>" + o.id + "</span></div></div></div>";
+                });
+                $("#product").html(str);
+            }
+
+        }
+
+
+        //同步加载商品数据
+        function renderProduct(page, limit,likeName,categoryId) {
+
+            $.ajax({
+                async: false,
+                contentType: "application/json",
+                url: '/api/product/select',
+                data: {"page": page, "limit": limit,"likeName":likeName,"categoryId":categoryId},
+                type: 'GET',
+                success: function (result) {
+                    resCount = result.data.total;
+                    resData = result.data.list;
+                    renderProductHtml(resData);
+                }
+            });
+        }
+
+        /*function renderProductx(page, limit,likeName,categoryId) {
+            $.ajax({
+                async: false,
+                contentType: "application/json",
+                url: '/api/product/select',
+                data: {"page": page, "limit": limit,"likeName":likeName,"categoryId":categoryId},
+                type: 'GET',
+                success: function (result) {
+                    resCount = result.data.total;
+                    resData = result.data.list;
+                    renderProductHtml(resData);
+                }
+            });
+        }*/
+
+
+        //分页的完整功能
+        function renderPage1() {
+            renderProduct(page, 10);
+            laypage.render({
+                elem: 'layuipage'
+                , count: resCount
+                , limit: 10
+                , limits: [5, 10, 15, 20, 25, 50, 100]
+                , curr: page
+                , theme: '   #009688'
+                , layout: ['count', 'prev', 'page', 'next', 'limit', 'refresh', 'skip']
+                , jump: function (obj, first) {
+                    page = obj.curr;
+                    if (!first) {
+                        renderProduct(page, obj.limit);
+                    }
+                }
+            });
+        }
+
+        // 监听搜索操作
+        form.on('submit(data-search-btn)', function (data) {
+            var param = data.field;
+            var categoryId = param.categoryId;
+            if (categoryId.search(",")){
+                var split = categoryId.split(",");
+                categoryId = split[split.length-1];
+            }
+            //执行搜索重载
+            renderProduct(page, 10,param.name,categoryId);
+            return false;
+        });
+
+        var categoryCascader = cascader.render({
+            elem: '#categoryCascader',
+            reqData: function (values, callback, data) {
+                $.get('/api/category/sub-category', {pid: data ? data.value : ''}, function (res) {
+                    var result = [];
+                    $.each(res.data, function (i, n) {
+                        result.push({value: n.id, label: n.name, haveChildren: !n.leaf});
+                    })
+                    callback(result);
+                })
+            }
+        });
+
+
+    });
+
+</script>
+
+</body>
+</html>
