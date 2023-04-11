@@ -8,7 +8,7 @@ import java.util.Date;
 public class CreateOrderDTO {
 
 
-	private String no;
+	private Long productId;
 
 	private Integer status;
 
@@ -16,7 +16,7 @@ public class CreateOrderDTO {
 
 	private Double payAmount;
 
-	private Double refundAmount;
+	//private Double refundAmount;
 
 	private Integer totalQuantity;
 
@@ -32,11 +32,11 @@ public class CreateOrderDTO {
 
 	private Date createTime;
 
-	private Date payTime;
+	/*private Date payTime;
 
 	private Integer logisticid;
 
-	private String logisticNo;
+	private String logisticNo;*/
 
 
 }

@@ -21,7 +21,7 @@ public class OrderVO {
     /**
      * 订单号       db_column: no
      */
-    private String no;
+    private Long productId;
     /**
      * 订单状态       db_column: status
      */
@@ -37,7 +37,7 @@ public class OrderVO {
     /**
      * 退款金额       db_column: refund_amount
      */
-    private Double refundAmount;
+    //private Double refundAmount;
     /**
      * 订单数量       db_column: total_quantity
      */
@@ -69,15 +69,15 @@ public class OrderVO {
     /**
      * 支付时间       db_column: pay_time
      */
-    private Date payTime;
+    //private Date payTime;
     /**
      * 快递       db_column: logisticid
      */
-    private Integer logisticid;
+    //private Integer logisticid;
     /**
      * 快递单号       db_column: logistic_no
      */
-    private String logisticNo;
+    //private String logisticNo;
 
 
 }

@@ -30,6 +30,18 @@
 	id,name,pic_filenames,price,original_price,cost_price,detail,create_time,create_admin,status,categoryid,stock,sales_num,virtual_sales_num,evaluation_num,evaluation_score,properties,note
 		</sql>
 
+	<update id="updateStock">
+		UPDATE p_product SET stock = stock - #{count},version = version + 1
+		<where>
+			<if test="id != null and id !=''">
+				and id = #{id}
+			</if>
+			<if test="version != null">
+				and version = #{version}
+			</if>
+		</where>
+	</update>
+
 
 	<!--<insert id="insert" useGeneratedKeys="true" keyProperty="id">
 	        insert into

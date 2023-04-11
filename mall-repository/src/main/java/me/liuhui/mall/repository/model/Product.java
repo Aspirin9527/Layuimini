@@ -95,10 +95,10 @@ public class Product {
     private Integer salesNum;
 
     /**
-     * 虚拟销量       db_column: virtual_sales_num
+     * 版本       db_column: version
      */
 
-    /*private Integer virtualSalesNum;*/
+    private Integer version;
 
     /**
      * 评价数量       db_column: evaluation_num

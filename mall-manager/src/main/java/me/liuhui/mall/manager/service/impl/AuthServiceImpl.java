@@ -53,6 +53,7 @@ public class AuthServiceImpl implements AuthService {
         vo.setAdminId(admin.getId());
         vo.setRealName(admin.getRealName());
         vo.setUsername(admin.getUsername());
+        vo.setPhone(admin.getPhone());
 
         AdminLoginRecord loginRecord = obtainRequest();
         loginRecord.setAdminId(admin.getId());

@@ -57,8 +57,8 @@ public class ProductServiceImpl implements ProductService {
     private ProductDetailDao productDetailDao;
     @Resource
     private FileService fileService;
-    @Resource
-    private ProductSearcher productSearcher;
+    /*@Resource
+    private ProductSearcher productSearcher;*/
 
     @Override
     public ResultVO<ListProductVO> list(ListProductDTO dto) {
@@ -112,9 +112,9 @@ public class ProductServiceImpl implements ProductService {
             productDao.update(product, "status");
             list.add(product);
         }
-        if (list.size() > 0) {
+        /*if (list.size() > 0) {
             productSearcher.save(convertDoc(list));
-        }
+        }*/
         if (StringUtils.isNotBlank(failMsg.toString())) {
             return ResultVO.buildFailResult(failMsg.toString());
         }
@@ -159,7 +159,7 @@ public class ProductServiceImpl implements ProductService {
             }
             product.setStatus(ProductStatus.SUSPEND.getCode());
             productDao.update(product, "status");
-            productSearcher.delete(id);
+            //productSearcher.delete(id);
         }
         if (StringUtils.isNotBlank(failMsg.toString())) {
             return ResultVO.buildFailResult(failMsg.toString());

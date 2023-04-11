@@ -16,4 +16,5 @@ public class AuthVO {
     private Long adminId;
     private String username;
     private String realName;
+    private String phone;
 }
