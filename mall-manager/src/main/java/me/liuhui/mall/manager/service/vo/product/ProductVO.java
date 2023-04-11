@@ -72,7 +72,7 @@ public class ProductVO {
     /**
      * 虚拟销量       db_column: virtual_sales_num
      */
-    private Integer virtualSalesNum;
+    /*private Integer virtualSalesNum;*/
     /**
      * 评价数量       db_column: evaluation_num
      */

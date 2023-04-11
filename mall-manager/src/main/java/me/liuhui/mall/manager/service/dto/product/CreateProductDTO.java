@@ -29,7 +29,7 @@ public class CreateProductDTO {
 
     private Integer salesNum;
 
-    private Integer virtualSalesNum;
+    /*private Integer virtualSalesNum;*/
 
 
 

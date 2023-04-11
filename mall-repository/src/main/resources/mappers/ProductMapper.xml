@@ -19,7 +19,7 @@
 		<result property="categoryid" column="categoryid"/>
 		<result property="stock" column="stock"/>
 		<result property="salesNum" column="sales_num"/>
-		<result property="virtualSalesNum" column="virtual_sales_num"/>
+		<!--<result property="virtualSalesNum" column="virtual_sales_num"/>-->
 		<result property="evaluationNum" column="evaluation_num"/>
 		<result property="evaluationScore" column="evaluation_score"/>
 		<result property="properties" column="properties"/>
