@@ -72,12 +72,15 @@
 <script charset="utf-8" src="../js/admin.js"></script>
 
 <script>
-    layui.use(['jquery', 'layer', 'form', 'cascader','laypage'], function () {
+    layui.use(['jquery', 'layer', 'form', 'cascader','laypage','miniTab'], function () {
         var $ = layui.jquery,
             layer = layui.layer,
             form = layui.form,
             cascader = layui.cascader,
-            laypage = layui.laypage;
+            laypage = layui.laypage,
+            miniTab = layui.miniTab;
+
+        miniTab.listen();
 
         var page = 1;//当前页
         //var limit = 10;//每页显示的数目
@@ -90,7 +93,8 @@
             if (data.length > 0) {
                 $.each(data, function (v, o) {
                     str += "<div style='margin:auto; margin-bottom:130px;  width:300px; height:150px; float:left; text-align:center'>" +
-                        "<div><img alt='' src='" + o.mainPic + "' width='150px' height='150px'/></div>";
+                        "<div><a href='javascript:;' layuimini-content-href='page/goods-detail.html?id="+o.id+"' data-title='商品详情' >" +
+                    "<img alt='' src='" + o.mainPic + "' width='150px' height='150px'/></a></div>";
                     str += "<div style='text-align:center'><div><label>商品名称:</label><span>" + o.name + "</span></div>";
                     str += "<div><label>价格:</label><span style='color:#FF3030;'>￥" + o.price + "</span></div>";
                     str += "<label>库存:</label><span style='color:#CDC9C9;'>" + o.stock + "</span></div>";
@@ -104,7 +108,6 @@
 
         //同步加载商品数据
         function renderProduct(page, limit,likeName,categoryId) {
-
             $.ajax({
                 async: false,
                 contentType: "application/json",
@@ -118,22 +121,6 @@
                 }
             });
         }
-
-        /*function renderProductx(page, limit,likeName,categoryId) {
-            $.ajax({
-                async: false,
-                contentType: "application/json",
-                url: '/api/product/select',
-                data: {"page": page, "limit": limit,"likeName":likeName,"categoryId":categoryId},
-                type: 'GET',
-                success: function (result) {
-                    resCount = result.data.total;
-                    resData = result.data.list;
-                    renderProductHtml(resData);
-                }
-            });
-        }*/
-
 
         //分页的完整功能
         function renderPage1() {
