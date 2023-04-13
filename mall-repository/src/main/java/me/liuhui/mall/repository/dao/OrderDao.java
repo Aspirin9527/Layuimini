@@ -3,7 +3,9 @@ import me.liuhui.mall.repository.dao.mybatis.provider.BaseDao;
 import me.liuhui.mall.repository.model.Order;
 import me.liuhui.mall.repository.model.annotation.MapperMapping;
 import me.liuhui.mall.repository.model.dao.DateCount;
+import me.liuhui.mall.repository.model.dao.OrderAnalyse;
 import org.apache.ibatis.annotations.Param;
+import org.springframework.data.domain.jaxb.OrderAdapter;
 
 import java.util.Date;
 import java.util.List;
@@ -16,5 +18,7 @@ public interface OrderDao extends BaseDao<Order,Long> {
 	Double sumAmount(Integer status);
 
 	List<DateCount> countOrder(@Param("minCreateTime") Date minCreateTime, @Param("maxCreateTime") Date maxCreateTime);
+
+	List<OrderAnalyse> dataAnalse(@Param("minCreateTime") Date minCreateTime, @Param("maxCreateTime") Date maxCreateTime);
 
 }

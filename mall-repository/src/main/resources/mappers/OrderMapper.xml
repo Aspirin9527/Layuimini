@@ -7,21 +7,16 @@
 
 	<resultMap id="BaseResultMap" type="me.liuhui.mall.repository.model.Order">
         	    <id column="id"  property="id" />
-	       		<result property="no" column="no"/>
+	       		<result property="productId" column="product_id"/>
 	       		<result property="status" column="status"/>
 	       		<result property="totalAmount" column="total_amount"/>
 	       		<result property="payAmount" column="pay_amount"/>
-	       		<result property="refundAmount" column="refund_amount"/>
 	       		<result property="totalQuantity" column="total_quantity"/>
 	       		<result property="consumerUserId" column="consumer_user_id"/>
-	       		<result property="consigneeTel" column="consignee_tel"/>
 	       		<result property="consigneeCellphone" column="consignee_cellphone"/>
 	       		<result property="consigneeName" column="consignee_name"/>
 	       		<result property="consigneeAddress" column="consignee_address"/>
 	       		<result property="createTime" column="create_time"/>
-	       		<result property="payTime" column="pay_time"/>
-	       		<result property="logisticid" column="logisticid"/>
-	       		<result property="logisticNo" column="logistic_no"/>
 	</resultMap>
 
 <sql id="BaseColumnList">
@@ -62,21 +57,29 @@ id,no,status,total_amount,pay_amount,refund_amount,total_quantity,consumer_user_
 	        o_order 
 	     where no = #{no}
     </select>
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   
-	
+
+	<select id="dataAnalse" resultType="me.liuhui.mall.repository.model.dao.OrderAnalyse">
+		select name,price,(price - cost_price)as profit, num
+		from p_product p
+		right join
+		(select product_id ,sum(total_quantity)as num
+		from o_order o
+		<where>
+			<if test="minCreateTime != null">
+				<![CDATA[
+					and create_time >= #{minCreateTime}
+	    		]]>
+			</if>
+			<if test="maxCreateTime != null">
+				<![CDATA[
+					and create_time <= #{maxCreateTime}
+		    	]]>
+			</if>
+		</where>
+		group by product_id)t
+		on p.id = t.product_id
+	</select>
+
+
 </mapper>
 
