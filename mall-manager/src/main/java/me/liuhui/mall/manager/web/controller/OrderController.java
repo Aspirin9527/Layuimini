@@ -3,10 +3,7 @@ package me.liuhui.mall.manager.web.controller;
 import me.liuhui.mall.common.base.vo.ResultVO;
 import me.liuhui.mall.manager.service.OrderService;
 import me.liuhui.mall.manager.service.ProductService;
-import me.liuhui.mall.manager.service.dto.order.CreateOrderDTO;
-import me.liuhui.mall.manager.service.dto.order.ListOrderDTO;
-import me.liuhui.mall.manager.service.dto.order.ModifyOrderDTO;
-import me.liuhui.mall.manager.service.dto.order.OrderDTO;
+import me.liuhui.mall.manager.service.dto.order.*;
 import me.liuhui.mall.manager.service.dto.product.ListProductDTO;
 import me.liuhui.mall.manager.service.vo.order.ListOrderVO;
 import me.liuhui.mall.manager.service.vo.product.ListProductVO;
@@ -54,14 +51,13 @@ public class OrderController {
 	}
 
 	/**
-	 * 获取已上架的货品
-	 * @param dto
+	 * 订单数据分析
+	 * @param
 	 * @return
 	 */
-	@PostMapping("getGoods")
-	public ResultVO<ListProductVO> list(ListProductDTO dto) {
-		dto.setStatus(1);
-		return productService.list(dto);
+	@PostMapping("analyse")
+	public void dataAnalyse(AnalyseOrderDTO dto) {
+		orderService.dataAnalyse(dto);
 	}
 
 
