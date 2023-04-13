@@ -9,6 +9,9 @@
     <link rel="stylesheet" href="../lib/layui-v2.5.6/css/layui.css" media="all">
     <link rel="stylesheet" href="../css/public.css" media="all">
 </head>
+<style>
+
+</style>
 <body>
 <div class="layuimini-container">
     <div class="layuimini-main">
@@ -19,7 +22,8 @@
                     <div class="layui-carousel" style="margin: 0px auto; width: 100%; height: 800px; background-color: transparent;">
                         <div class="layui-this">
                             <form class="layui-form" style="margin: 0 auto;max-width: 900px;padding-top: 40px;">
-                                <div id="product" class="layui-form-item" style="margin:auto; margin-bottom:130px; height:450px;"></div>
+                                <div id="product" class="layui-form-item" style="margin:auto; margin-bottom:130px; height:450px;">
+                                </div>
                             </form>
                         </div>
                     </div>
@@ -52,13 +56,17 @@
         //渲染展示商品的html页面
         function renderProductHtml(data) {
             var str = "";//用来存储html内容
-            str += "<div class='layui-inline' style='max-width: 450px'>" +
+            str += "<div class='layui-inline' style='max-width: 500px;margin:0px 30px'>" +
                 "<img alt='' src='" + data.mainPic + "' width='400px' height='450px'/></div>";
-            str += "<div class='layui-inline' style='max-width: 350px'>" +
-                "<div><label>商品名称:</label><span>" + data.name + "</span></div>";
-            str += "<div><label>价格:</label><span style='color:#FF3030;'>￥" + data.price + "</span></div>";
-            str += "<label>库存:</label><span style='color:#CDC9C9;'>" + data.stock + "</span></div>";
-            str += "<div style='display:none;'><label>商品ID:</label><span>" + data.id + "</span></div></div></div>";
+            str += "<div class='layui-inline' style='max-width: 350px; height: 400px'>" +
+                "<div style='font:700 18px Arial;margin:20px auto'><label>商品名称:</label><span style='margin:0px 5px'>" + data.name + "</span></div>";
+            str += "<div style='font:700 14px simsun;margin:10px auto;color: #9c9da0'><label>原 价:</label><span style='text-decoration: line-through'>￥" + data.originalPrice + "</span></div>";
+            str += "<div style='font:700 14px simsun;margin:10px auto;color: #9c9da0'><label>现 价:</label><span style='color:#FF3030;'>￥" + data.price + "</span></div>";
+            str += "<fieldset class='layui-elem-field'><legend>商品描述</legend><div class='layui-field-box' style='width:300px;height:200px;text-overflow: ellipsis;overflow: hidden;'>" + data.detail + "</div></fieldset>";
+            str += "<div style='margin: 20px 0px;'><div class='layui-input-inline' style='margin-right: 20px; max-width: 100px'><input type='text' name='saleNum' lay-verify='number|Ndouble' autocomplete='off' class='layui-input' min='1'></div>" +
+                "<div class='layui-form-mid layui-word-aux'>库存:<span style='color:#CDC9C9;'>" + data.stock + "</span></div>" +
+                "<button type='button' class='layui-btn layui-btn-danger' id='submit' lay-filter='shopping' lay-submit style='margin-left: 20px'>立即订购</button></div>"
+            str += "<div style='display:none;'><input name='productId' value='"+data.id+"'></div></div></div>";
             $("#product").html(str);
         }
 
@@ -79,6 +87,44 @@
             });
         }
 
+
+        // 输入框校验
+        form.verify({
+            Ndouble: [
+                /^[1-9]\d*$/
+                , '只能输入正整数'
+            ]
+        });
+
+        var param = {};
+        //监听提交
+        form.on('submit(shopping)', function(data){
+            $.extend(param, data.field);
+            var loadIndex = layer.load(2);
+            $.ajax({
+                url: '/api/order/create',
+                type: 'post',
+                contentType: "application/json",
+                data: JSON.stringify(param),
+                dataType: "json",
+                success: function (res) {
+                    layer.close(loadIndex);
+                    if (res.code === 0) {
+                        layer.msg(res.msg, {icon: 1}, function () {
+                            var iframeIndex = parent.layer.getFrameIndex(window.name);
+                            parent.layer.close(iframeIndex);
+                            parent.location.reload();
+                        });
+
+                    } else {
+                        layer.msg(res.msg, {icon: 2});
+                    }
+                }, error: function (data) {
+                    layer.close(loadIndex);
+                    layer.msg(data.responseJSON.msg, {icon: 2});
+                }
+            });
+        });
 
     });
 

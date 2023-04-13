@@ -20,7 +20,7 @@ import java.util.Map;
 public interface BaseDao<T, PK extends Serializable> {
     @Options(useGeneratedKeys = true, keyProperty="id", keyColumn="id")
     @InsertProvider(type = GenericMapperProvider.class, method = "insert")
-    void insert(T t);
+    Integer insert(T t);
 
     @DeleteProvider(type = GenericMapperProvider.class, method = "delete")
     void delete(PK pk);

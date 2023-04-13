@@ -32,8 +32,8 @@ public class ProductDoc {
 	private int salesNum;
 	@Field
 	private double evaluationScore;
-	@Field
-	private int evaluationNum;
+	/*@Field
+	private int evaluationNum;*/
 	@Field
 	private List<String> categoryNames;
 	@Field

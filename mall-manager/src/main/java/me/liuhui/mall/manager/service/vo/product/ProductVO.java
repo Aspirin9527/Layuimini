@@ -76,7 +76,7 @@ public class ProductVO {
     /**
      * 评价数量       db_column: evaluation_num
      */
-    private Integer evaluationNum;
+    /*private Integer evaluationNum;*/
     /**
      * 商品评价的总平均分       db_column: evaluation_score
      */

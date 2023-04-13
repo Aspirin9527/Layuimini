@@ -6,7 +6,6 @@ import cn.hutool.core.util.IdUtil;
 import me.liuhui.mall.common.base.vo.ResultVO;
 import me.liuhui.mall.manager.runtime.AdminSessionHolder;
 import me.liuhui.mall.manager.service.OrderService;
-import me.liuhui.mall.manager.service.ProductService;
 import me.liuhui.mall.manager.service.dto.order.ListOrderDTO;
 import me.liuhui.mall.manager.service.dto.order.ModifyOrderDTO;
 import me.liuhui.mall.manager.service.dto.order.OrderDTO;
@@ -21,7 +20,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -61,18 +59,18 @@ public class OrderServiceImpl implements OrderService {
     public ResultVO<Boolean> create(OrderDTO dto) {
         Product product = productDao.selectByPk(dto.getProductId());
         Integer stock = product.getStock();
-		//库存要大于0才能买
+        //库存要大于0才能买
         if (stock > 0 && (stock - dto.getSaleNum() > 0)) {
-            boolean b = productDao.updateStock(product.getId(), dto.getSaleNum(), product.getVersion());
-            if (b) {
-                AuthVO current = AdminSessionHolder.getCurrentAdmin();
-                Snowflake snowflake = IdUtil.getSnowflake(1, 1);
-                Order order = Order.builder().id(snowflake.nextId()).productId(product.getId()).status(1).totalAmount(dto.getSaleNum() * product.getPrice())
-                        .payAmount(dto.getSaleNum() * product.getPrice()).totalQuantity(dto.getSaleNum()).consumerUserId(Math.toIntExact(current.getAdminId()))
-                        .consigneeName(current.getRealName()).consigneeCellphone(current.getPhone()).build();
-                orderDao.insert(order);
-                return ResultVO.buildSuccessResult();
+            AuthVO current = AdminSessionHolder.getCurrentAdmin();
+            Snowflake snowflake = IdUtil.getSnowflake(1, 1);
+            Order order = Order.builder().id(snowflake.nextId()).productId(product.getId()).status(1).totalAmount(dto.getSaleNum() * product.getPrice())
+                    .payAmount(dto.getSaleNum() * product.getPrice()).totalQuantity(dto.getSaleNum()).consumerUserId(Math.toIntExact(current.getAdminId()))
+                    .consigneeName(current.getRealName()).consigneeCellphone(current.getPhone()).build();
+            Integer insert = orderDao.insert(order);
+            if (insert>0){
+                productDao.updateStock(product.getId(), dto.getSaleNum(), product.getVersion());
             }
+            return ResultVO.buildSuccessResult();
         }
         return ResultVO.buildFailResult("购买失败，库存不足！");
     }
