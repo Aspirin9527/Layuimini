@@ -1,6 +1,7 @@
 package me.liuhui.mall.manager.web.controller;
 
 import me.liuhui.mall.common.base.vo.ResultVO;
+import me.liuhui.mall.manager.kmeans.Cluster;
 import me.liuhui.mall.manager.service.OrderService;
 import me.liuhui.mall.manager.service.ProductService;
 import me.liuhui.mall.manager.service.dto.order.*;
@@ -14,6 +15,8 @@ import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 @Validated
@@ -56,8 +59,8 @@ public class OrderController {
 	 * @return
 	 */
 	@PostMapping("analyse")
-	public void dataAnalyse(AnalyseOrderDTO dto) {
-		orderService.dataAnalyse(dto);
+	public ResultVO<Map<String, Object>> dataAnalyse(AnalyseOrderDTO dto) {
+		return orderService.dataAnalyse(dto);
 	}
 
 

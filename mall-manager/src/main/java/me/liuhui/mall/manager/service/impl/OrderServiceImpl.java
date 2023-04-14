@@ -16,6 +16,7 @@ import me.liuhui.mall.manager.service.dto.order.OrderDTO;
 import me.liuhui.mall.manager.service.mapstruct.OrderConverter;
 import me.liuhui.mall.manager.service.vo.auth.AuthVO;
 import me.liuhui.mall.manager.service.vo.order.ListOrderVO;
+import me.liuhui.mall.manager.service.vo.order.OrderAnalyseVO;
 import me.liuhui.mall.repository.dao.OrderDao;
 import me.liuhui.mall.repository.dao.ProductDao;
 import me.liuhui.mall.repository.model.Order;
@@ -25,10 +26,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Created on 2020/10/14 20:12
@@ -75,7 +73,7 @@ public class OrderServiceImpl implements OrderService {
                     .payAmount(dto.getSaleNum() * product.getPrice()).totalQuantity(dto.getSaleNum()).consumerUserId(Math.toIntExact(current.getAdminId()))
                     .consigneeName(current.getRealName()).consigneeCellphone(current.getPhone()).build();
             Integer insert = orderDao.insert(order);
-            if (insert>0){
+            if (insert > 0) {
                 productDao.updateStock(product.getId(), dto.getSaleNum(), product.getVersion());
             }
             return ResultVO.buildSuccessResult();
@@ -105,27 +103,53 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public void dataAnalyse(AnalyseOrderDTO analyseOrderDTO) {
-        List<DataPoint> dataPoints = new ArrayList<>();
+    public ResultVO<Map<String, Object>> dataAnalyse(AnalyseOrderDTO analyseOrderDTO) {
+        //定价-销量分析
+        List<DataPoint> pricePoints = new ArrayList<>();
+        // 利润-销量分析
+        List<DataPoint> profitPoints = new ArrayList<>();
         List<OrderAnalyse> orderAnalyses = orderDao.dataAnalse(analyseOrderDTO.getMinCreateTime(), analyseOrderDTO.getMaxCreateTime());
         orderAnalyses.forEach(orderAnalyse -> {
-            double[] features = new double[3];
-            features[0] = Double.parseDouble(orderAnalyse.getNum()); // 销量
-            features[1] = Double.parseDouble(orderAnalyse.getPrice()); // 定价
-            features[2] = Double.parseDouble(orderAnalyse.getPrice()); // 单价利润
-            dataPoints.add(new DataPoint(orderAnalyse.getName(),features));
+            double[] price = new double[2];
+            double[] profit = new double[2];
+            price[0] = Double.parseDouble(orderAnalyse.getNum()); // 销量
+            price[1] = Double.parseDouble(orderAnalyse.getPrice()); // 定价
+            pricePoints.add(new DataPoint(orderAnalyse.getName(), price));
+            profit[0] = Double.parseDouble((orderAnalyse.getNum())); // 销量
+            profit[1] = Double.parseDouble((orderAnalyse.getProfit())); // 单价利润
+            profitPoints.add(new DataPoint(orderAnalyse.getName(), profit));
         });
-        List<Cluster> clusters = kMeansAlgorithm.kMeansClustering(dataPoints, 2);
+        //定价-销量
+        List<Cluster> priceClusters = kMeansAlgorithm.kMeansClustering(pricePoints, 2);
+        // 利润-销量
+        List<Cluster> profitClusters = kMeansAlgorithm.kMeansClustering(profitPoints, 2);
 
-        // 打印聚类结果
+        Map<String, Object> map = new HashMap<>(2);
+        map.put("priceClusters", buildData(priceClusters));
+        map.put("profitClusters", buildData(profitClusters));
+        return ResultVO.buildSuccessResult(map);
+    }
+
+    /**
+     * 构建分析数据
+     *
+     * @param clusters
+     * @return
+     */
+    private List<OrderAnalyseVO> buildData(List<Cluster> clusters) {
+        List<OrderAnalyseVO> analyseVOList = new ArrayList<>();
         for (int i = 0; i < clusters.size(); i++) {
-            System.out.println("Cluster " + (i + 1) + ":");
+            OrderAnalyseVO analyse = new OrderAnalyseVO();
+            List<double[]> features = new ArrayList<>();
             for (DataPoint dataPoint : clusters.get(i).getDataPoints()) {
-                System.out.println(dataPoint);
+                double[] feature = dataPoint.getFeatures();
+                features.add(feature);
             }
-            System.out.println("Centroid: " + clusters.get(i).getCentroid());
-            System.out.println();
+            analyse.setClusterGroup("Cluster" + (i + 1));
+            analyse.setFeatures(features);
+            analyseVOList.add(analyse);
         }
+        return analyseVOList;
     }
 
 }

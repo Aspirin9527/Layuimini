@@ -69,7 +69,7 @@ public class ProductController {
         return productService.delete(ids);
     }
 
-    @PerCode({"ad:add", "ad:update"})
+    /*@PerCode({"ad:add", "ad:update"})*/
     @GetMapping("select")
     public ResultVO<ListProductVO> select(ListProductDTO dto) {
         dto.setStatus(ProductStatus.SELLING.getCode());
