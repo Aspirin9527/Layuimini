@@ -19,4 +19,5 @@ public class AdminInitVO {
     private Set<String> perCodes;
     private String realName;
     private String frontDomain;
+    private String basePath;
 }

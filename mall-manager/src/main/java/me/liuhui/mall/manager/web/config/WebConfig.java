@@ -5,6 +5,7 @@ import me.liuhui.mall.manager.web.interceptor.PermissionInterceptor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
+import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 /**
@@ -29,5 +30,9 @@ public class WebConfig implements WebMvcConfigurer {
         registry.addInterceptor(permissionInterceptor()).addPathPatterns("/**");
     }
 
+    @Override
+    public void addResourceHandlers(ResourceHandlerRegistry registry) {
+        registry.addResourceHandler("/file/**").addResourceLocations("file:D:/code/mini-mall/mall-static/");
+    }
 
 }

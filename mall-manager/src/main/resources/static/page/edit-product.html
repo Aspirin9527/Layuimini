@@ -175,7 +175,7 @@
                 form.val('step3Form', res.data);
                 categoryCascader.setValue(res.data.allCategoryIds.split(','));
                 $.each(res.data.picFilenames.split(','), function (i, o) {
-                    $('#pics').append('<img data-path="' + o + '" src="' + top.app.frontDomain + o + '"  class="layui-upload-img"  alt=""/><a class=" del-icon layui-icon layui-icon-close-fill Del" href="javascript:;"  />');
+                    $('#pics').append('<img data-path="' + o + '" src="' + top.app.basePath + o + '"  class="layui-upload-img"  alt=""/><a class=" del-icon layui-icon layui-icon-close-fill Del" href="javascript:;"  />');
                 });
                 uploadInst.reload({number: picNum - $('#pics>img').size()});
                 editor.txt.html(res.data.detail);// 重新设置编辑器内容
@@ -224,7 +224,7 @@
                     return;
                 }
                 //上传完毕回调
-                $('#pics').append('<img data-path="' + res.data.path + '" src="' + res.data.url + '"  class="layui-upload-img"  alt=""/><a class=" del-icon layui-icon layui-icon-close-fill Del" href="javascript:;"  />');
+                $('#pics').append('<img data-path="' + res.data.path + '" src="'+top.app.basePath + res.data.url + '"  class="layui-upload-img"  alt=""/><a class=" del-icon layui-icon layui-icon-close-fill Del" href="javascript:;"  />');
                 var input = $('input[name=picFilenames]');
                 input.val(input.val() ? (input.val() + "," + res.data.path) : res.data.path);
             },

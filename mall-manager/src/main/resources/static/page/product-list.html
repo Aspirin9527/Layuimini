@@ -129,12 +129,12 @@
                 {type: "checkbox", width: 50},
                 {
                     title: '主图', width:110, templet: function (d) {
-                        return '<img  width="80" style="cursor: zoom-in" data-index="' + (d.LAY_INDEX - 1) + '"    tb-img src="' + parent.app.frontDomain + d.mainPic + '"/>'
+                        return '<img width="80" style="cursor: zoom-in" data-index="' + (d.LAY_INDEX - 1) + '"    tb-img src="' + parent.app.basePath + d.mainPic + '"/>'
                     }
                 },
                 {
                     title: '商品名称', height: 100, minWidth: 150, sort: true, templet: function (d) {
-                        return '<a target="_blank" href="' + parent.app.frontDomain + '/product/' + d.id + '" class="layui-table-link">' + d.name + '</a>'
+                        return d.name
                     }
                 },
                 {
@@ -403,7 +403,7 @@
             var imgList = table.cache['productTableId'].map(function (d) {
                 return {
                     alt: d.name,
-                    src: parent.app.frontDomain + d.mainPic
+                    src: parent.app.basePath + d.mainPic
                 }
             });
             layer.photos({photos: {data: imgList, start: $(this).data('index')}, shade: .1, closeBtn: true});

@@ -85,7 +85,8 @@ layui.define(["jquery", "miniMenu", "element","miniTab", "miniTheme"], function 
                     miniAdmin.deleteLoader(options.loadingTime);
                     window.app = {
                         perCodes: data.perCodes,
-                        frontDomain: data.frontDomain
+                        frontDomain: data.frontDomain,
+                        basePath: data.basePath
                     };
                 }
             }).fail(function () {

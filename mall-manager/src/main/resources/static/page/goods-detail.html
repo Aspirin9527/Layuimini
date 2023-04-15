@@ -57,7 +57,7 @@
         function renderProductHtml(data) {
             var str = "";//用来存储html内容
             str += "<div class='layui-inline' style='max-width: 500px;margin:0px 30px'>" +
-                "<img alt='' src='" + data.mainPic + "' width='400px' height='450px'/></div>";
+                "<img alt='' src='" +parent.app.basePath+ data.mainPic + "' width='400px' height='450px'/></div>";
             str += "<div class='layui-inline' style='max-width: 350px; height: 400px'>" +
                 "<div style='font:700 18px Arial;margin:20px auto'><label>商品名称:</label><span style='margin:0px 5px'>" + data.name + "</span></div>";
             str += "<div style='font:700 14px simsun;margin:10px auto;color: #9c9da0'><label>原 价:</label><span style='text-decoration: line-through'>￥" + data.originalPrice + "</span></div>";

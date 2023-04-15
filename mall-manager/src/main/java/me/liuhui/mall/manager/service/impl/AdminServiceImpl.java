@@ -66,6 +66,7 @@ public class AdminServiceImpl implements AdminService {
         Set<String> perCodes = AdminSessionHolder.getPermission().stream().map(Permission::getCode).collect(Collectors.toSet());
         adminInitVO.setPerCodes(perCodes);
         adminInitVO.setFrontDomain(frontDomain);
+        adminInitVO.setBasePath("/file/");
         return ResultVO.buildSuccessResult(adminInitVO);
     }
 
