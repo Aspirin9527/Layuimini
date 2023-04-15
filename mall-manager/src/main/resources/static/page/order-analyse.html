@@ -13,10 +13,31 @@
 <body>
 <div class="layuimini-container">
     <div class="layuimini-main">
+        <fieldset class="table-search-fieldset">
+            <legend>搜索信息</legend>
+            <div style="margin: 10px 10px 10px 10px">
+                <form class="layui-form layui-form-pane" action="">
+                    <div class="layui-form-item">
+                        <div class="layui-inline">
+                            <label class="layui-form-label">下单时间</label>
+                            <div class="layui-input-inline">
+                                <input type="text" name="createTime" autocomplete="off" class="layui-input rangeDate">
+                            </div>
+                        </div>
+
+                        <div class="layui-inline">
+                            <button type="submit" class="layui-btn layui-btn-primary" lay-submit
+                                    lay-filter="data-search-btn"><i class="layui-icon"></i> 搜 索
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </fieldset>
+
         <div class="layui-row layui-col-space15">
             <div class="layui-col-md12">
                 <div class="layui-row layui-col-space15">
-
                     <div class="layui-col-md6">
                         <div class="layui-card">
                             <div class="layui-card-header"><i class="fa fa-line-chart icon"></i>定价-销量聚类分析</div>
@@ -44,106 +65,127 @@
 <script src="../lib/layui-v2.5.6/layui.js" charset="utf-8"></script>
 <script src="../js/lay-config.js?v=1.0.4" charset="utf-8"></script>
 <script charset="utf-8" src="../js/admin.js"></script>
-
 <script>
-    layui.use(['layer', 'miniTab', 'countUp','echarts'], function () {
+    layui.use(['form','layer', 'miniTab','echarts','laydate'], function () {
         var $ = layui.jquery,
+            form = layui.form,
             layer = layui.layer,
             miniTab = layui.miniTab,
-            countUp = layui.countUp,
+            laydate = layui.laydate,
             echarts = layui.echarts;
 
         miniTab.listen();
 
+        reloadData('','');
         /**
-         * 报表功能
+         * echars功能
          */
-        var echartsRecords = echarts.init(document.getElementById('echarts-records'), 'walden');
-        var optionRecords = {
-            tooltip: {
-                trigger: 'axis'
-            },
-            legend: {
-                data:['登录次数','下单数量']
-            },
-            grid: {
-                left: '3%',
-                right: '4%',
-                bottom: '3%',
-                containLabel: true
-            },
-            toolbox: {
-                feature: {
-                    saveAsImage: {}
-                }
-            },
-            xAxis: {
-                type: 'category',
-                boundaryGap: false,
-                data:[]
-            },
-            yAxis: {
-                type: 'value'
-            },
-            series: [
-                {
-                    name:'登录次数',
-                    type:'line',
-                    data:[]
-                },
-                {
-                    name:'下单数量',
-                    type:'line',
-                    data:[]
-                }
-            ]
-        };
+        var echartsRecords = echarts.init(document.getElementById('echarts-records'));
+        var echartsProfit = echarts.init(document.getElementById('echarts-profit'));
 
-        window.onresize = function(){
-            echartsRecords.resize();
-        }
-
-
-        // echarts 窗口缩放自适应
-        var endDay = new Date();
-        var beginDay = new Date();
-        beginDay.setMonth(beginDay.getMonth()-1);
-
-        $.post('/api/order/analyse',function (res) {
-        console.log(res);
-            /**$.each(res.data,function (k,v) {
-                if(typeof v == 'number'){
-                    if(v.toString().indexOf('.') !== -1){
-                        new countUp(k, v,{decimalPlaces:2}).start();
-                    }else{
-                        new countUp(k, v).start();
-                    }
-                }
-
-                var i = 0 ,j=0;
-                while (beginDay.getTime() <= endDay.getTime() ) {
-                    var d = beginDay.format("yyyy-MM-dd");
-                    optionRecords.xAxis.data.push(d);
-                    if(res.data.loginCount[i] && res.data.loginCount[i].date === d ){
-                        optionRecords.series[0].data.push(res.data.loginCount[i++].num);
-                    }else{
-                        optionRecords.series[0].data.push(0);
-                    }
-                    if(res.data.orderCount[j] && res.data.orderCount[j].date === d ){
-                        optionRecords.series[1].data.push(res.data.orderCount[j++].num);
-                    }else{
-                        optionRecords.series[1].data.push(0);
-                    }
-                    beginDay.setDate(beginDay.getDate() + 1);
-                }
-
-                echartsRecords.setOption(optionRecords);
-            });*/
+        /* 渲染时间选择 */
+        laydate.render({
+            elem: 'input.rangeDate',
+            type: 'date',
+            range: true,
+            trigger: 'click'
         });
 
+        // 监听搜索操作
+        form.on('submit(data-search-btn)', function (data) {
+            var param = data.field;
+            if(data.field.createTime) {
+                var createTime = data.field.createTime.split(' - ');
+                param.minCreateTime = createTime[0];
+                param.maxCreateTime = createTime[1];
+            }else{
+                param.minCreateTime = '';
+                param.maxCreateTime = '';
+            }
+            //执行搜索重载
+            reloadData(param.minCreateTime,param.maxCreateTime);
+            return false;
+        });
 
+        function reloadData(minCreateTime,maxCreateTime) {
+            var params = {minCreateTime:minCreateTime,maxCreateTime:maxCreateTime};
+            $.ajax({
+                contentType: "application/json",
+                url: '/api/order/analyse',
+                type: 'POST',
+                data: JSON.stringify(params),
+                success:function (res) {
+                    //定价-销量图
+                    var price = res.data.priceClusters;
+                    var pieces = [];
+                    for (let i = 0; i < price.length; i++) {
+                        pieces.push({
+                            name: price[i].clusterGroup,
+                            symbolSize: 20,
+                            data:price[i].features,
+                            color:COLOR_ALL[i],
+                            type: 'scatter',
+                            encode: { tooltip: [0, 1] },
+                        });
+                    }
 
+                    var optionRecords = {
+                        xAxis: {name:"定价"},
+                        yAxis: {name:"销量"},
+                        legend:{
+                            left: 'center'
+                        },
+                        tooltip: {
+                            position: 'top'
+                        },
+                        series: pieces
+                    };
+                    echartsRecords.setOption(optionRecords);
 
+                    //利润-销量图
+                    const profit = res.data.profitClusters;
+                    const profitData = [];
+                    for (let i = 0; i < profit.length; i++) {
+                        profitData.push({
+                            name: profit[i].clusterGroup,
+                            symbolSize: 20,
+                            data:profit[i].features,
+                            color:COLOR_ALL[i],
+                            type: 'scatter',
+                            encode: { tooltip: [0, 1] },
+                        });
+                    }
+
+                    var optionProfits = {
+                        xAxis: {name:"利润"},
+                        yAxis: {name:"销量"},
+                        legend:{
+                            left: 'center'
+                        },
+                        tooltip: {
+                            position: 'top'
+                        },
+                        series: profitData
+                    };
+                    echartsProfit.setOption(optionProfits);
+                }
+            })
+        }
+
+        var COLOR_ALL = [
+            '#37A2DA',
+            '#e06343',
+            '#37a354',
+            '#b55dba',
+            '#b5bd48',
+            '#96BFFF'
+        ];
+
+        // echarts 窗口缩放自适应
+        window.onresize = function(){
+            echartsRecords.resize();
+            echartsProfit.resize();
+        }
     });
 </script>
 </body>

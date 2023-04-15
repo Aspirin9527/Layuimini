@@ -5,7 +5,6 @@ import me.liuhui.mall.repository.model.annotation.MapperMapping;
 import me.liuhui.mall.repository.model.dao.DateCount;
 import me.liuhui.mall.repository.model.dao.OrderAnalyse;
 import org.apache.ibatis.annotations.Param;
-import org.springframework.data.domain.jaxb.OrderAdapter;
 
 import java.util.Date;
 import java.util.List;

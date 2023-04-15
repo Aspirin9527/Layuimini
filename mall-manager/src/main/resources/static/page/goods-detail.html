@@ -100,7 +100,7 @@
         //监听提交
         form.on('submit(shopping)', function(data){
             $.extend(param, data.field);
-            var loadIndex = layer.load(2);
+            // var loadIndex = layer.load(2);
             $.ajax({
                 url: '/api/order/create',
                 type: 'post',
@@ -108,7 +108,7 @@
                 data: JSON.stringify(param),
                 dataType: "json",
                 success: function (res) {
-                    layer.close(loadIndex);
+                    // layer.close(loadIndex);
                     if (res.code === 0) {
                         layer.msg(res.msg, {icon: 1}, function () {
                             var iframeIndex = parent.layer.getFrameIndex(window.name);
@@ -120,7 +120,7 @@
                         layer.msg(res.msg, {icon: 2});
                     }
                 }, error: function (data) {
-                    layer.close(loadIndex);
+                    // layer.close(loadIndex);
                     layer.msg(data.responseJSON.msg, {icon: 2});
                 }
             });

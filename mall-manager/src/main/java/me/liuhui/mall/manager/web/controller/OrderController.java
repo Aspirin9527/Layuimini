@@ -1,13 +1,13 @@
 package me.liuhui.mall.manager.web.controller;
 
 import me.liuhui.mall.common.base.vo.ResultVO;
-import me.liuhui.mall.manager.kmeans.Cluster;
 import me.liuhui.mall.manager.service.OrderService;
 import me.liuhui.mall.manager.service.ProductService;
-import me.liuhui.mall.manager.service.dto.order.*;
-import me.liuhui.mall.manager.service.dto.product.ListProductDTO;
+import me.liuhui.mall.manager.service.dto.order.AnalyseOrderDTO;
+import me.liuhui.mall.manager.service.dto.order.ListOrderDTO;
+import me.liuhui.mall.manager.service.dto.order.ModifyOrderDTO;
+import me.liuhui.mall.manager.service.dto.order.OrderDTO;
 import me.liuhui.mall.manager.service.vo.order.ListOrderVO;
-import me.liuhui.mall.manager.service.vo.product.ListProductVO;
 import me.liuhui.mall.manager.web.annotation.PerCode;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -59,8 +58,14 @@ public class OrderController {
 	 * @return
 	 */
 	@PostMapping("analyse")
-	public ResultVO<Map<String, Object>> dataAnalyse(AnalyseOrderDTO dto) {
-		return orderService.dataAnalyse(dto);
+	public ResultVO<Map<String, Object>> dataAnalyse(@RequestBody AnalyseOrderDTO dto) {
+		ResultVO<Map<String, Object>> mapResultVO = null;
+		try {
+			mapResultVO = orderService.dataAnalyse(dto);
+		}catch (Exception e){
+			e.printStackTrace();
+		}
+		return mapResultVO;
 	}
 
 

@@ -26,6 +26,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -104,30 +105,46 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public ResultVO<Map<String, Object>> dataAnalyse(AnalyseOrderDTO analyseOrderDTO) {
-        //定价-销量分析
-        List<DataPoint> pricePoints = new ArrayList<>();
-        // 利润-销量分析
-        List<DataPoint> profitPoints = new ArrayList<>();
-        List<OrderAnalyse> orderAnalyses = orderDao.dataAnalse(analyseOrderDTO.getMinCreateTime(), analyseOrderDTO.getMaxCreateTime());
-        orderAnalyses.forEach(orderAnalyse -> {
-            double[] price = new double[2];
-            double[] profit = new double[2];
-            price[0] = Double.parseDouble(orderAnalyse.getNum()); // 销量
-            price[1] = Double.parseDouble(orderAnalyse.getPrice()); // 定价
-            pricePoints.add(new DataPoint(orderAnalyse.getName(), price));
-            profit[0] = Double.parseDouble((orderAnalyse.getNum())); // 销量
-            profit[1] = Double.parseDouble((orderAnalyse.getProfit())); // 单价利润
-            profitPoints.add(new DataPoint(orderAnalyse.getName(), profit));
-        });
-        //定价-销量
-        List<Cluster> priceClusters = kMeansAlgorithm.kMeansClustering(pricePoints, 2);
-        // 利润-销量
-        List<Cluster> profitClusters = kMeansAlgorithm.kMeansClustering(profitPoints, 2);
+        int numClusters = 4;
+        try {
+            //定价-销量分析
+            List<DataPoint> pricePoints = new ArrayList<>();
+            // 利润-销量分析
+            List<DataPoint> profitPoints = new ArrayList<>();
+            Date MinCreateTime = null;
+            Date MaxCreateTime = null;
+            if (!analyseOrderDTO.getMinCreateTime().isEmpty() && !analyseOrderDTO.getMaxCreateTime().isEmpty()){
+                MinCreateTime = new SimpleDateFormat("yyyy-MM-dd").parse(analyseOrderDTO.getMinCreateTime());
+                MaxCreateTime = new SimpleDateFormat("yyyy-MM-dd").parse(analyseOrderDTO.getMaxCreateTime());
+            }
+            List<OrderAnalyse> orderAnalyses = orderDao.dataAnalse(MinCreateTime, MaxCreateTime);
+            orderAnalyses.forEach(orderAnalyse -> {
+                double[] price = new double[2];
+                double[] profit = new double[2];
+                price[0] = Double.parseDouble(orderAnalyse.getPrice()); // 定价
+                price[1] = Double.parseDouble(orderAnalyse.getNum()); // 销量
+                pricePoints.add(new DataPoint(orderAnalyse.getName(), price));
+                profit[0] = Double.parseDouble((orderAnalyse.getProfit())); // 单价利润
+                profit[1] = Double.parseDouble((orderAnalyse.getNum())); // 销量
+                profitPoints.add(new DataPoint(orderAnalyse.getName(), profit));
+            });
 
-        Map<String, Object> map = new HashMap<>(2);
-        map.put("priceClusters", buildData(priceClusters));
-        map.put("profitClusters", buildData(profitClusters));
-        return ResultVO.buildSuccessResult(map);
+            if (orderAnalyses.size() < numClusters){
+                return ResultVO.buildFailResult("样本数据太少，无法进行聚类分析！");
+            }
+            //定价-销量
+            List<Cluster> priceClusters = kMeansAlgorithm.kMeansClustering(pricePoints, numClusters);
+            // 利润-销量
+            List<Cluster> profitClusters = kMeansAlgorithm.kMeansClustering(profitPoints, numClusters);
+
+            Map<String, Object> map = new HashMap<>(2);
+            map.put("priceClusters", buildData(priceClusters));
+            map.put("profitClusters", buildData(profitClusters));
+            return ResultVO.buildSuccessResult(map);
+        }catch (Exception e){
+            e.printStackTrace();
+            return ResultVO.buildFailResult(e.getMessage());
+        }
     }
 
     /**

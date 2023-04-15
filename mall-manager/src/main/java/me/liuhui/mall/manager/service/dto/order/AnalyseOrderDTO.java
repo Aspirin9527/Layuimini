@@ -1,9 +1,6 @@
 package me.liuhui.mall.manager.service.dto.order;
 
 import lombok.Data;
-import org.springframework.format.annotation.DateTimeFormat;
-
-import java.util.Date;
 
 /**
  * @author lin
@@ -12,8 +9,6 @@ import java.util.Date;
 @Data
 public class AnalyseOrderDTO {
 
-    @DateTimeFormat(pattern = "yyyy-MM-dd")
-    private Date minCreateTime;
-    @DateTimeFormat(pattern = "yyyy-MM-dd")
-    private Date maxCreateTime;
+    private String minCreateTime;
+    private String maxCreateTime;
 }
