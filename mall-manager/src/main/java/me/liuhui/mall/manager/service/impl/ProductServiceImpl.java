@@ -2,7 +2,6 @@
 package me.liuhui.mall.manager.service.impl;
 
 import me.liuhui.mall.common.base.vo.ResultVO;
-import me.liuhui.mall.common.search.ProductSearcher;
 import me.liuhui.mall.common.search.document.ProductDoc;
 import me.liuhui.mall.common.service.FileService;
 import me.liuhui.mall.common.service.dto.TempToProductDTO;
@@ -153,10 +152,7 @@ public class ProductServiceImpl implements ProductService {
                 continue;
 
             }
-            if (countPromotion(id) > 0) {
-                failMsg.append("产品正在广告中:").append(product.getName());
-                continue;
-            }
+
             product.setStatus(ProductStatus.SUSPEND.getCode());
             productDao.update(product, "status");
             //productSearcher.delete(id);

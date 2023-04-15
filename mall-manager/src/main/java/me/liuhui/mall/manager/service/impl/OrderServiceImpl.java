@@ -67,7 +67,7 @@ public class OrderServiceImpl implements OrderService {
         Product product = productDao.selectByPk(dto.getProductId());
         Integer stock = product.getStock();
         //库存要大于0才能买
-        if (stock > 0 && (stock - dto.getSaleNum() > 0)) {
+        if (stock >= 0 && (stock - dto.getSaleNum() >= 0)) {
             AuthVO current = AdminSessionHolder.getCurrentAdmin();
             Snowflake snowflake = IdUtil.getSnowflake(1, 1);
             Order order = Order.builder().id(snowflake.nextId()).productId(product.getId()).status(1).totalAmount(dto.getSaleNum() * product.getPrice())
